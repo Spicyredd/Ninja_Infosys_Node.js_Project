@@ -5,8 +5,9 @@ import { PassportModule } from '@nestjs/passport';
 import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
-// You will create this file in a later step for route protection
-// import { JwtStrategy } from './jwt.strategy'; 
+import { JwtStrategy } from './jwt.strategy';
+
+const JWT_SECRET = process.env.JWT_SECRET
 
 @Module({
   imports: [
@@ -14,11 +15,11 @@ import { AuthController } from './auth.controller';
     PassportModule,
     JwtModule.register({
       // IMPORTANT: Use environment variables for these in production!
-      secret: 'YOUR_SUPER_SECRET_KEY', // Change this to a strong, random secret
+      secret: JWT_SECRET, // Change this to a strong, random secret
       signOptions: { expiresIn: '1d' }, // e.g., '60s', '1h', '7d'
     }),
   ],
-  providers: [AuthService /*, JwtStrategy */], // Add JwtStrategy later
+  providers: [AuthService, JwtStrategy],
   controllers: [AuthController],
 })
 export class AuthModule { }

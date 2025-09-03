@@ -1,16 +1,37 @@
-import { Controller, Get, UseGuards } from '@nestjs/common';
+import { Controller, Get, UseGuards, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
-// import { AuthGuard } from '@nestjs/passport'; // We will uncomment this in D2
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import type { Request } from 'express';
+
 
 @Controller() // We'll handle the pathing inside the methods
 export class UsersController {
   constructor(private readonly usersService: UsersService) { }
 
-  // The OpenAPI spec maps GET /me to this controller
+  @UseGuards(JwtAuthGuard)
+  async getProfile(@Req() req: Request) {
+    if (!req.user || typeof req.user !== 'object' || !('email' in req.user)) {
+      return {
+        success: false,
+        message: 'User info not found in request.',
+      };
+    }
+    const user = await this.usersService.getProfile((req.user as any).email);
+    return {
+      success: true,
+      data: user,
+    };
+  }
   @Get('me')
-  // @UseGuards(AuthGuard('jwt')) // TODO: Add JWT authentication in D2
-  async getProfile(email: string) { // TODO: Get user from request in D2
-    const user = await this.usersService.getProfile(email); // For now, it takes no args
+  @UseGuards(JwtAuthGuard)
+  async getProfileById(@Req() req: Request) {
+    if (!req.user || typeof req.user !== 'object' || !('email' in req.user)) {
+      return {
+        success: false,
+        message: 'User info not found in request.',
+      };
+    }
+    const user = await this.usersService.getProfileById((req.user as any).id);
     return {
       success: true,
       data: user,

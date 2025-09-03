@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCategoryDto } from './dto/create-category.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class CategoriesService {
   create(createCategoryDto: CreateCategoryDto) {
     // --- THIS IS A PLACEHOLDER FOR D1 ---
     console.log('CategoriesService create method called with:', createCategoryDto);
-    
+
     // Return a mock of what the created category would look like
     return {
       id: 1,
@@ -18,7 +19,7 @@ export class CategoriesService {
   findAll() {
     // --- THIS IS A PLACEHOLDER FOR D1 ---
     console.log('CategoriesService findAll method called.');
-    
+
     // Return a mock array of categories
     return [
       {
