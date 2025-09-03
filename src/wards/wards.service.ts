@@ -1,31 +1,14 @@
 import { Injectable } from '@nestjs/common';
-
+import { PrismaService } from 'src/prisma/prisma.service';
+import { Ward } from '@prisma/client';
 @Injectable()
 export class WardsService {
-  findAll() {
-    // --- THIS IS A PLACEHOLDER FOR D1 ---
-    console.log('WardsService findAll method called.');
+  constructor(private prisma: PrismaService) { }
 
-    // Return a mock array of wards
-    return [
-      {
-        id: 1,
-        code: 'KTM-01',
-        name_en: 'Ward 1',
-        name_np: 'वडा १',
-      },
-      {
-        id: 10,
-        code: 'KTM-10',
-        name_en: 'Ward 10',
-        name_np: 'वडा १०',
-      },
-      {
-        id: 32,
-        code: 'KTM-32',
-        name_en: 'Ward 32',
-        name_np: 'वडा ३२',
-      },
-    ];
+  async findAll(): Promise<Ward[] | null> {
+    /**
+     * @returns All a list containing all the ward objects if available else return null
+     */
+    return this.prisma.ward.findMany();
   }
 }
