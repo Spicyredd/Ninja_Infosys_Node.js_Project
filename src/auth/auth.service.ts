@@ -1,27 +1,59 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { UsersService } from '../users/users.service';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  // We will inject other services here in D2
-  constructor() { }
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) { }
 
-  // Add this method
+  /**
+   * Authenticates a user by validating their email and password.
+   * If credentials are valid, it returns a JWT access token.
+   * @param email The user's email.
+   * @param password The user's plain-text password.
+   * @returns An object containing the access token.
+   * @throws UnauthorizedException if credentials are invalid.
+   */
   async login(email: string, password: string) {
-    // --- THIS IS A PLACEHOLDER FOR D1 ---
-    // The real logic will be implemented in D2.
     // 1. Find the user by email.
+    const user = await this.usersService.getProfile(email);
+
+    // It's a good security practice to use a generic error message
+    // to prevent attackers from discovering which emails are registered.
+    if (!user) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     // 2. Compare the provided password with the stored hash.
+    const isPasswordMatching = await bcrypt.compare(password, user.password);
+    // console.log(user)
+    // var isPasswordMatching = false
+    // if (password === user.password) {
+    //   isPasswordMatching = true
+    // }
+    if (!isPasswordMatching) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+
     // 3. If they match, generate and return a JWT.
-    // 4. If not, throw an UnauthorizedException.
+    // The JWT payload should contain essential, non-sensitive user info.
+    const payload = {
+      sub: user.id, // 'sub' is the standard claim for subject (user ID)
+      email: user.email,
+      role: user.role,
+    };
 
-    console.log('AuthService login method called with:');
-    console.log({ email, password });
+    const accessToken = await this.jwtService.signAsync(payload);
 
-    // Return a mock response that matches the API spec for now
+    // 4. Return the response in the format specified by the apispec
     return {
       success: true,
       data: {
-        access_token: 'placeholder-jwt-for-now-this-will-be-real-in-d2',
+        access_token: accessToken,
       },
     };
   }
