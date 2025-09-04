@@ -1,10 +1,19 @@
 import { Injectable } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
+import { PrismaService } from 'src/prisma/prisma.service';
+
 
 @Injectable()
 export class CommentsService {
-  create(createCommentDto: CreateCommentDto) {
-    return 'This action adds a new comment';
+  constructor(private prisma: PrismaService) { }
+  async create(id: string, createCommentDto: CreateCommentDto, authorId: string) {
+    const comment = await this.prisma.comment.create({
+      data: {
+        ...createCommentDto,
+        ticketId: id,
+        authorId: authorId,
+      }
+    })
   }
 
   findAll() {
