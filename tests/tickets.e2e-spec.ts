@@ -13,7 +13,7 @@ describe('Tickets flow', () => {
 
   beforeAll(async () => {
     // Seed users beforehand. Replace with seeded creds.
-    citizenToken = await login('citizen@example.com', 'Passw0rd!')
+    citizenToken = await login('rbeeju20@gmail.com', 'password0')
   })
 
   it('creates a ticket', async () => {

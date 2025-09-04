@@ -22,6 +22,8 @@ export class UsersController {
       data: user,
     };
   }
+
+
   @Get('me')
   @UseGuards(JwtAuthGuard)
   async getProfileById(@Req() req: Request) {
@@ -31,7 +33,8 @@ export class UsersController {
         message: 'User info not found in request.',
       };
     }
-    const user = await this.usersService.getProfileById((req.user as any).id);
+    console.log((req.user as any).sub)
+    const user = await this.usersService.getProfileById((req.user as any).sub);
     return {
       success: true,
       data: user,

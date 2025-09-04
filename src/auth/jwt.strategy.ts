@@ -1,32 +1,35 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+// src/auth/jwt.strategy.ts
+import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
 import { ExtractJwt, Strategy } from 'passport-jwt';
 
-// You should load this from a .env file, not hardcode it
 const JWT_SECRET = process.env.JWT_SECRET ?? 'default-secret';
+
+// Ensure this matches the payload structure when you create the token
+export interface JwtPayload {
+    sub: string;
+    email: string;
+    role: string;
+}
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
     constructor() {
         super({
-            // Tell the strategy HOW to find the token
             jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-            // Don't allow expired tokens
             ignoreExpiration: false,
-            // The SAME secret key used to sign the token in your AuthModule
-            secretOrKey: JWT_SECRET,
+            // IMPORTANT: This secret MUST match the secret used to sign the token
+            secretOrKey: JWT_SECRET, // Or your config service
         });
     }
 
-    /**
-     * This method is called by Passport ONLY AFTER it has successfully
-     * verified the token's signature and expiration.
-     * @param payload The decoded JSON payload from the JWT.
-     * @returns The object you want to attach to the request as `req.user`.
-     */
-    async validate(payload: { sub: string; email: string; role: string }) {
-        // Here you could add more logic, like checking if the user is banned, etc.
-        // For now, we'll just return the payload as is.
-        return { id: payload.sub, email: payload.email, role: payload.role };
+    // This method is called after the token is verified.
+    // The 'payload' parameter is the decoded JWT payload.
+    // Whatever you return from here becomes `req.user`.
+    async validate(payload: JwtPayload) {
+        console.log('JWT Strategy validate method called with payload:', payload); // <--- ADD THIS LOG
+
+        // We are returning the entire payload, so req.user will be { sub, email, role }
+        return { sub: payload.sub, email: payload.email, role: payload.role };
     }
 }

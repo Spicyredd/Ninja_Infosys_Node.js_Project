@@ -51,10 +51,7 @@ export class AuthService {
 
     // 4. Return the response in the format specified by the apispec
     return {
-      success: true,
-      data: {
-        access_token: accessToken,
-      },
-    };
+      access_token: accessToken
+    }
   }
 }

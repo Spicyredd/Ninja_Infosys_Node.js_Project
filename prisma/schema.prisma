@@ -58,7 +58,7 @@ model Category {
 
 model Ticket {
   id           String       @id @default(uuid())
-  code         String?       @unique
+  code         String       @unique
   title        String
   description  String
   status       TicketStatus @default(NEW)
