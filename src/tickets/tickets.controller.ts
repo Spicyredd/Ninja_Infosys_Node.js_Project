@@ -2,19 +2,26 @@ import { Controller, Get, Post, Body, Param, Query, Patch, ParseIntPipe, Default
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
 import type { Request } from 'express';
-import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { createSuccessResponse } from '../common/utils/api.response';
-import { ApiResponse, SuccessResponse } from 'src/common/types/api.types';
+import { ApiResponse, SuccessResponse } from '../common/types/api.types';
 import { AssignTicketDto } from './dto/assign-ticket.dto';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Roles } from 'src/auth/roles.decorators';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorators';
 import { Role } from '@prisma/client'
 import { UpdateStatusDto } from './dto/update-status.dto';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 
-@Controller('tickets')
+const THROTTLE_TTL = process.env.THROTTLE_TTL ? process.env.THROTTLE_TTL as any : 60000
+const THROTTLER_LIMIT_TICKET = process.env.THROTTLER_LIMIT_TICKET ? process.env.THROTTLER_LIMIT_TICKET as any : 60000
+
+
+@UseGuards(ThrottlerGuard)
+@Throttle({default: {ttl:THROTTLE_TTL, limit:THROTTLER_LIMIT_TICKET}})
+@Controller('tickets/')
 export class TicketsController {
   constructor(private readonly ticketsService: TicketsService) { }
-
+  
   @Post()
   @UseGuards(JwtAuthGuard)
   async create(
@@ -26,7 +33,6 @@ export class TicketsController {
     const ticketCount = newTicketData[1]
     return createSuccessResponse(newTicket, { totalTickets: ticketCount })
   }
-
 
   @Get()
   async findAll(

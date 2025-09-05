@@ -6,13 +6,17 @@ import { UsersModule } from '../users/users.module';
 import { AuthService } from './auth.service';
 import { AuthController } from './auth.controller';
 import { JwtStrategy } from './jwt.strategy';
+import { ThrottlerModule } from '@nestjs/throttler';
+import { PrismaModule } from 'src/prisma/prisma.module';
 
 const JWT_SECRET = process.env.JWT_SECRET
 
 @Module({
   imports: [
+    PrismaModule,
     UsersModule, // Make UsersService available for injection
     PassportModule,
+    ThrottlerModule,
     JwtModule.register({
       // IMPORTANT: Use environment variables for these in production!
       secret: JWT_SECRET, // Change this to a strong, random secret

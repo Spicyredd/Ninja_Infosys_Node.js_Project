@@ -20,12 +20,14 @@
     "test:e2e": "jest --config ./tests/jest-e2e.json"
   },
   "dependencies": {
+    "@golevelup/ts-jest": "^0.7.0",
     "@nestjs/common": "^11.0.1",
     "@nestjs/core": "^11.0.1",
     "@nestjs/jwt": "^11.0.0",
     "@nestjs/mapped-types": "*",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.1",
+    "@nestjs/throttler": "^6.4.0",
     "@prisma/client": "^6.15.0",
     "bcrypt": "^6.0.0",
     "bcryptjs": "^3.0.2",

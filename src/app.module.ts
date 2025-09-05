@@ -8,10 +8,21 @@ import { WardsModule } from './wards/wards.module';
 import { TicketsModule } from './tickets/tickets.module';
 import { CommentsModule } from './comments/comments.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { ThrottlerModule } from '@nestjs/throttler';
 
+const THROTTLE_TTL = process.env.THROTTLE_TTL ? process.env.THROTTLE_TTL as any : 60000
+const THROTTLE_LIMIT_PUBLIC = process.env.THROTTLE_LIMIT_PUBLIC ? process.env.THROTTLE_LIMIT_PUBLIC as any : 60000
 
 @Module({
-  imports: [AuthModule, PrismaModule, UsersModule, CategoriesModule, WardsModule, TicketsModule, CommentsModule],
+  imports: [
+    ThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: 60000,
+          limit: 10,
+        },
+      ],
+    }), AuthModule, PrismaModule, UsersModule, CategoriesModule, WardsModule, TicketsModule, CommentsModule],
   controllers: [AppController],
   providers: [AppService],
 })
